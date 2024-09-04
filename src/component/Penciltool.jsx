@@ -8,7 +8,7 @@ const Penciltool = () => {
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight - 64; // Adjust for navbar height
+    canvas.height = window.innerHeight - 64; 
     
     const ctx = canvas.getContext('2d');
     ctx.lineCap = 'round';

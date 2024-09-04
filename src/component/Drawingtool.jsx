@@ -1,6 +1,6 @@
-import React, { useLayoutEffect, useState, useRef } from 'react';
+import React, { useLayoutEffect, useState, useRef,useCallback } from 'react';
 import rough from 'roughjs/bundled/rough.esm.js';
-
+import Sidebar from './Sidebar';
 const gen = rough.generator();
 
 function createElement(id, x1, y1, x2, y2, shape) {
@@ -135,6 +135,22 @@ const DrawingTool = ({ selectedShape }) => {
   const [selectedElement, setSelectedElement] = useState(null);
   const [tool, setTool] = useState('none');
   const canvasRef = useRef(null);
+  const handleKeyDown = useCallback((event) => {
+    if (event.ctrlKey) {
+      if (event.key === 'z') {
+        undo();
+      } else if (event.key === 'y') {
+        redo();
+      }
+    }
+  }, [undo, redo]);
+
+  useLayoutEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -167,6 +183,8 @@ const DrawingTool = ({ selectedShape }) => {
       if (element) {
         setSelectedElement(element);
         setAction('moving');
+      } else {
+        setSelectedElement(null);
       }
     }
   };
@@ -199,23 +217,24 @@ const DrawingTool = ({ selectedShape }) => {
       updateElement(id, x1, y1, x2, y2, shape);
     }
     setAction('none');
-    setSelectedElement(null);
   };
 
   return (
     <>
-      <canvas
-        ref={canvasRef}
-        width={window.innerWidth}
-        height={window.innerHeight - 64}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        style={{ cursor: action === 'moving' ? cursorForPosition(selectedElement?.position) : 'crosshair' }}
-      />
-      <div style={{ position: 'absolute', top: '70px', left: '10px' }}>
-        <button onClick={undo}>Undo</button>
-        <button onClick={redo}>Redo</button>
+      <div className='flex'>
+      
+        <canvas
+          ref={canvasRef}
+          width={window.innerWidth}
+          height={window.innerHeight - 64}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          style={{ cursor: action === 'moving' ? cursorForPosition(selectedElement?.position) : 'crosshair' }}
+        />
+          {selectedElement && (
+          <Sidebar selectedElement={selectedElement} updateElement={updateElement} />
+        )}
       </div>
     </>
   );

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import DrawingTool from './component/DrawingTool';
+import DrawingTool from './component/Drawingtool';
 import Penciltool from './component/Penciltool';
 import Navbar from './ui/Navbar';
+import Sidebar from './component/Sidebar';
+
 
 const App = () => {
   const [selectedTool, setSelectedTool] = useState('select');
